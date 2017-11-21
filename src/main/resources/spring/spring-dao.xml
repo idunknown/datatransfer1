@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+<!--配置dao相关的bean-->
+
+    <!--事务管理-->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource">
+            <ref bean="dataSource" />
+        </property>
+    </bean>
+
+
+    <!-- spring事务代理 用于配置service bean-->
+    <bean id="transactionProxy"
+          class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+          lazy-init="true">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+            <!-- <ref bean="transactionJTAManager"/> -->
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED,-AppException,-PrcException,-IllegalArgumentException
+                </prop>
+            </props>
+        </property>
+    </bean>
+    <!--xml 扫描-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations">
+            <list>
+                <value>classpath:com/xz/framework/system/app/login/mapper/*Mapper.xml</value>
+                <value>classpath:com/xz/app/**/mapper/*Mapper.xml</value><!--包隔离-->
+            </list>
+        </property>
+    </bean>
+    <bean id="sqlSessionFactoryRead" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSourceRead" />
+        <property name="mapperLocations">
+            <list>
+                <value>classpath:com/xz/app/**/mapperread/*Mapper.xml</value><!--包隔离-->
+            </list>
+        </property>
+    </bean>
+
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.xz.**.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.xz.**.daoread"/><!---->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryRead"/>
+    </bean>
+    <!--做一个抽象dao用于做分页等-->
+    <!--   <bean id="abstractDAO" abstract="true" class="com.wuhy.basedao.AbstractDao" >
+           <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+       </bean>-->
+    <!-- 加入注解配置 -->
+<!--    <context:annotation-config />-->
+    <!-- 自动扫描非Controller包 -->
+    <context:component-scan base-package="com.xz"> <!--包含context:annotation-config功能 注册bean、注入bean-->
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller" />
+        <context:exclude-filter  type="annotation"
+                                 expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+    </context:component-scan>
+    <!--事务-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--可以把以下bean注入BaseDao-->
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" name="sqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+    </bean>
+
+    <bean id="countStatementUtil" class="com.xz.framework.util.CountStatementUtil" init-method="init">
+        <property name="sessionTemplate" ref="sqlSessionTemplate"></property>
+        <property name="dialect" >
+            <bean class="com.xz.framework.system.sysbean.impl.MySQLDialect"></bean>
+        </property>
+    </bean>
+    <bean id="sqlSessionDaoSupport" class="org.mybatis.spring.support.SqlSessionDaoSupport" abstract="true">
+
+    </bean>
+    <bean id="baseDao" class="com.xz.framework.system.sysservice.BaseDao" parent="sqlSessionDaoSupport" >
+        <property name="sqlSessionTemplate" ref="sqlSessionTemplate">
+        </property>
+    </bean>
+</beans>

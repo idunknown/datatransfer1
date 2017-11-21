@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--加载常量配置文件-->
+    <bean class="com.xz.framework.system.preload.SysConfig"
+           destroy-method="destroy"> <!--init-method="init"-->
+        <property name="fileEncoding" value="UTF-8"></property>
+    </bean>
+    <!--加载数据库数据到缓存-->
+</beans>

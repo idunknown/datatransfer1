@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-2.5.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+
+	<import resource="spring/spring-properties.xml"></import><!--常量文件配置-->
+	<import resource="spring/spring-datasource.xml"></import><!--数据库-->
+
+	<import resource="spring/spring-dao.xml"></import><!--事务以及一些底层dao-->
+	<import resource="com/xz/framework/resources/spring-system.xml"></import>
+<!--	<import resource="spring/spring-security.xml"></import>-->
+    <import resource="spring/spring-task.xml"></import>
+	<!--<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>-->
+
+</beans>

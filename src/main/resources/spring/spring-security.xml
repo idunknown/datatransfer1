@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+          http://www.springframework.org/schema/security
+          http://www.springframework.org/schema/security/spring-security-4.2.xsd">
+    <!-- 认证管理器,配置了管理员与角色的关系  -->
+    <security:authentication-manager>
+        <!-- 配置账号密码所属的角色  角色以 ROLE_开头，为spring获取名称的标识 -->
+        <security:authentication-provider>
+            <!-- 采用xml的方式
+             -->
+            <security:user-service>
+                <security:user name="user" password="user" authorities="ROLE_USER" />
+                <security:user name="admin" password="admin" authorities="ROLE_ADMIN" />
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <!--
+        auto-config="true"      : 自动生成登录页面
+        pattern="/admin/**"     : 为配置的路径,**表示支持子目录
+        access="ROLE_ADMIN"     : 需要管理员权限,“ROLE_”前缀是一个提示Spring使用基于角色的检查的标记。
+        use-expressions="true"    : 表示access中支持hasRole这样的函数
+     -->
+    <security:http auto-config="true" use-expressions="true" >
+
+        <!-- xml配置 access-denied-page="/login.jsp?error=access-denied-page"
+         -->
+        <security:access-denied-handler error-page="/login.jsp"></security:access-denied-handler>
+        <security:intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
+        <security:intercept-url pattern="/user/**" access="hasAnyRole('ROLE_USER','ROLE_ADMIN')" />
+        <security:intercept-url pattern="/**" access="permitAll" />
+       <!-- <security:custom-filter ref=""-->
+
+        <!--自定义登录界面-->
+        <security:form-login default-target-url="/user/index.jsp"
+                             username-parameter="username"
+                             password-parameter="password"
+                             authentication-failure-url="/login.jsp?error=authentication-failure-url"
+                             login-page="/login.jsp" login-processing-url="/mylogin"
+
+        />
+
+    </security:http>
+
+</beans>

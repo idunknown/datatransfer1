@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xz.app.transfer.daoread.DataTransMapper">
+
+<select id="selectPrice" resultType="com.xz.app.transfer.domain.DataTransEntity" parameterType="hashmap">
+  SELECT
+    a.ac02id,
+    a.AC01ID,
+	a.AA01002,
+	a.AA02001,
+	a.aa02002,
+	a.ac02001,/*零售价*/
+    a.ac02002,/*批发价*/
+	a.ac02003,/*超市价*/
+	a.ac02004,/*集市价*/
+	b.AA11001,
+	c.ab13004,
+	b.aa11002
+FROM
+    ja_acx_02 a,
+	ja_acx_01 b,
+	ja_abp_13 c
+WHERE
+	a.AC01ID = b.ac01id
+AND b.ab13id = c.ab13id
+AND c.ab13004 = #{ab13004,jdbcType=BIGINT} and b.AB11ID in (3,65,66)
+</select>
+
+</mapper>

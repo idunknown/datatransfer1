@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd ">
+
+    <!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+
+    <!-- Enables the Spring MVC @Controller programming model -->
+    <!--json解析-->
+    <bean id="jsonConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="objectMapper">
+            <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                <property name="dateFormat">
+                    <bean class="java.text.SimpleDateFormat">
+                        <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+<!--    <bean  class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="jsonConverter" />
+            </list>
+        </property>
+    </bean>-->
+    <!--注解扫描controller前置bean,如下功能，同时可以配置messageConverters
+    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
+    <bean   class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter"/>
+    <context:component-scan base-package="" />
+    -->
+    <mvc:annotation-driven >
+         <mvc:message-converters>
+            <ref bean="jsonConverter"></ref>
+         </mvc:message-converters>
+        <!-- 此处可以替换上面的RequestMappingHandlerAdapter  bean,如果保留上面，则RequestMappingHandlerAdapter必须放在后面-->
+    </mvc:annotation-driven>
+    <!-- 自动扫描Controller包 -->
+    <context:component-scan base-package="com.xz" use-default-filters="false">
+        <context:include-filter  type="annotation"
+                                expression="org.springframework.stereotype.Controller" />
+        <context:include-filter  type="annotation"
+                                 expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+    </context:component-scan>
+  <!--  &lt;!&ndash;扫描注解&ndash;&gt;
+    <context:component-scan base-package="com" />-->
+
+    <!--静态资源-->
+ <!-- <mvc:resources mapping="/resources/**" location="/resources/" />-->
+    <mvc:resources mapping="/images/**" location="/images/" />
+    <mvc:resources mapping="/js/**" location="/js/" />
+    <mvc:resources mapping="/html/**" location="/html/" />
+ <!--controller 返回视图-->
+    <!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+
+    <bean id="jspView" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.InternalResourceView"/>
+        <property name="prefix" value="/WEB-INF/views/" />
+        <property name="suffix" value=".jsp" />
+        <property name="order" value="0"/>
+        <property name="alwaysInclude" value="true"/>
+        <property name="contentType" value="text/html;charset=UTF-8"/>
+    </bean>
+
+<!--
+        <bean id="htmlView" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+            <property name="viewClass" value="com.hello.HtmlResourceView"/>
+            <property name="prefix" value="/WEB-INF/html/" />
+            <property name="suffix" value=".html" />
+            <property name="order" value="1"/>
+           &lt;!&ndash; <property name="contentType" value="text/html"></property>&ndash;&gt;
+            <property name="alwaysInclude" value="true"/>
+        </bean>
+-->
+
+<!--    <bean id="viewResolverFtl" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+
+
+        <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
+        <property name="contentType" value="text/html; charset=UTF-8"/>
+    &lt;!&ndash;    <property name="exposeRequestAttributes" value="true" />
+        <property name="exposeSessionAttributes" value="true" />
+        <property name="exposeSpringMacroHelpers" value="true" />&ndash;&gt;
+        <property name="cache" value="true" />
+        <property name="suffix" value=".html" />
+        <property name="order" value="1"/>
+    </bean>
+    <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <property name="templateLoaderPath" value="/html/" />
+        <property name="defaultEncoding" value="UTF-8" />
+    </bean>-->
+  <!--  <mvc:interceptors>
+        &lt;!&ndash; 多个拦截器，顺序执行 &ndash;&gt;
+      &lt;!&ndash;  <mvc:interceptor>
+            &lt;!&ndash; /** 表示所有的url，包括子url路径 &ndash;&gt;
+            <mvc:mapping path="/**"/>
+            <bean class="cn.labelnet.ssm.filter.HanderInterceptor1"></bean>
+        </mvc:interceptor>&ndash;&gt;
+        &lt;!&ndash; 配置登陆拦截器 &ndash;&gt;
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/user/login"/>
+            <mvc:exclude-mapping path="/user/register"/>
+            <bean class="com.xz.framework.system.intercepter.login.LoginHandlerIntercepter"></bean>
+
+        </mvc:interceptor>
+        &lt;!&ndash;
+        .....
+
+         &ndash;&gt;
+    </mvc:interceptors>-->
+
+    <!--开启切面扫描-->
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+</beans>
