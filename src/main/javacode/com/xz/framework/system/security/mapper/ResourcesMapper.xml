@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xz.framework.system.security.dao.ResourcesMapper">
+<select id="findAll" resultType="com.xz.framework.system.security.domain.Resources">
+SELECT a.*/*,b.roleid*/ FROM resources  a /*,roleresources b*/ /*where a.resourcesid=b.resourcesid*/
+</select>
+
+</mapper>

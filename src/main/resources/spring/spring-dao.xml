@@ -40,7 +40,7 @@
         <property name="dataSource" ref="dataSource" />
         <property name="mapperLocations">
             <list>
-                <value>classpath:com/xz/framework/system/app/login/mapper/*Mapper.xml</value>
+                <value>classpath:com/xz/framework/system/security/mapper/*Mapper.xml</value>
                 <value>classpath:com/xz/app/**/mapper/*Mapper.xml</value><!--包隔离-->
             </list>
         </property>

@@ -1,15 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.xz.framework.system.app.login.dao.UserMapper">
+<mapper namespace="com.xz.framework.system.security.dao.UserMapper">
   <resultMap id="BaseResultMap" type="com.xz.framework.system.app.login.domain.User">
-    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="userid" jdbcType="INTEGER" property="userid" />
     <result column="loginid" jdbcType="VARCHAR" property="loginid" />
     <result column="loginidgo" jdbcType="VARCHAR" property="loginidgo" />
     <result column="effective" jdbcType="CHAR" property="effective" />
   </resultMap>
+
+  <resultMap id="MyUserResultMap" type="com.xz.framework.system.security.domain.MyUser">
+    <id column="userid" jdbcType="INTEGER" property="userid" />
+    <result column="loginid" jdbcType="VARCHAR" property="loginid" />
+    <result column="loginidgo" jdbcType="VARCHAR" property="loginidgo" />
+    <result column="effective" jdbcType="CHAR" property="effective" />
+
+    <collection property="role" column="userid" javaType="java.util.HashSet" select="selectRoles">
+
+    </collection>
+  </resultMap>
+  <resultMap id="userroleResultMap" type="com.xz.framework.system.security.domain.Role">
+
+    <id column="urid" jdbcType="INTEGER" property="urid" />
+    <result column="userid" jdbcType="INTEGER" property="userid" />
+    <result column="roleid" jdbcType="VARCHAR" property="roleid" />
+    <result column="effective" jdbcType="CHAR" property="effective" />
+
+    <collection property="resources" column="roleid" javaType="java.util.HashSet" select="selectResources">
+
+    </collection>
+  </resultMap>
   <sql id="Base_Column_List">
-    id, loginid, loginidgo, effective
+    userid, loginid, loginidgo, effective
   </sql>
+
+
+  <select id="selectResources" resultType="com.xz.framework.system.security.domain.Resources">
+    select b.* from roleresources  a, resources b where a.resourcesid=b.resourcesid and roleid=#{roleid,jdbcType=VARCHAR}
+  </select>
+  <select id="selectRoles" resultMap="userroleResultMap">
+    select *from userrole where userid=#{userid,jdbcType=VARCHAR}
+  </select>
   <select id="selectByLoginidPass" parameterType="com.xz.framework.system.app.login.domain.User" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
@@ -20,23 +50,23 @@
     select 
     <include refid="Base_Column_List" />
     from user
-    where id = #{id,jdbcType=INTEGER}
+    where userid = #{userid,jdbcType=INTEGER}
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from user
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{userid,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.xz.framework.system.app.login.domain.User">
-    insert into user (id, loginid, loginidgo, 
+    insert into user (userid, loginid, loginidgo,
       effective)
-    values (#{id,jdbcType=INTEGER}, #{loginid,jdbcType=VARCHAR}, #{loginidgo,jdbcType=VARCHAR}, 
+    values (#{userid,jdbcType=INTEGER}, #{loginid,jdbcType=VARCHAR}, #{loginidgo,jdbcType=VARCHAR},
       #{effective,jdbcType=CHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.xz.framework.system.app.login.domain.User">
     insert into user
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
+      <if test="userid != null">
         id,
       </if>
       <if test="loginid != null">
@@ -51,7 +81,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=INTEGER},
+        #{userid,jdbcType=INTEGER},
       </if>
       <if test="loginid != null">
         #{loginid,jdbcType=VARCHAR},
@@ -77,20 +107,22 @@
         effective = #{effective,jdbcType=CHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where userid = #{userid,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.xz.framework.system.app.login.domain.User">
     update user
     set loginid = #{loginid,jdbcType=VARCHAR},
       loginidgo = #{loginidgo,jdbcType=VARCHAR},
       effective = #{effective,jdbcType=CHAR}
-    where id = #{id,jdbcType=INTEGER}
+    where userid = #{userid,jdbcType=INTEGER}
   </update>
-  <select id="selectByLoginid" parameterType="string" resultMap="BaseResultMap" >
+  <select id="selectByLoginid" parameterType="string" resultMap="MyUserResultMap" >
      SELECT
     <include refid="Base_Column_List"></include>
+
     from user
-    where loginid = #{loginid,jdbcType=VARCHAR}
+    where  loginid = #{loginid,jdbcType=VARCHAR} and <if test="loginid != null"> 1=1</if>
+    and <if test="loginid != null"> 1=1</if>
   </select>
 
 </mapper>

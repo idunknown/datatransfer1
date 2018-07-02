@@ -68,14 +68,14 @@
 		</appender>
 
 		<!--日志打印的包的范围，及分类日志文件存储 -->
-		<logger name="com.xz" additivity="false">
+<!--		<logger name="com.xz" additivity="false">
 			<level value="DEBUG" />
 			<appender-ref ref="STDOUT"/>
 			<appender-ref ref="ERROR"/>
 			<appender-ref ref="DEBUG" />
-			<!--<appender-ref ref="ACCESS"/>-->
+			&lt;!&ndash;<appender-ref ref="ACCESS"/>&ndash;&gt;
 			<appender-ref ref="INFO" />
-		</logger>
+		</logger>-->
 <!--	<logger name="com" additivity="false">
 		<level value="debug" />
 		<appender-ref ref="STDOUT"/>
@@ -83,6 +83,9 @@
 		<appender-ref ref="DEBUG" />
 		&lt;!&ndash;<appender-ref ref="ACCESS"/>&ndash;&gt;
 		<appender-ref ref="INFO" />
+	</logger>-->
+<!--	<logger name="org.springframework" level="ERROR">
+		<appender-ref ref="STDOUT"/>
 	</logger>-->
 		<!--控制台打印资源加载信息-->
 		<root  level="DEBUG" >

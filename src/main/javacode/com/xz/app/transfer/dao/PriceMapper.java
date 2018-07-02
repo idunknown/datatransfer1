@@ -4,6 +4,7 @@ import com.xz.app.transfer.domain.DataTransEntity;
 import com.xz.app.transfer.domain.Price;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PriceMapper {
     int deleteByPrimaryKey(Integer id);
@@ -18,4 +19,10 @@ public interface PriceMapper {
 
     int updateByPrimaryKey(Price record);
     int insertBatch(List<DataTransEntity> list);
+
+    int insertYbj(Map map);
+
+    int insertYbjBatch( List list);
+
+
 }

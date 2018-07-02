@@ -8,4 +8,5 @@
         <property name="fileEncoding" value="UTF-8"></property>
     </bean>
     <!--加载数据库数据到缓存-->
+
 </beans>

@@ -1,6 +1,6 @@
 package com.xz.framework.system.app.login.service.impl;
 
-import com.xz.framework.system.app.login.dao.UserMapper;
+import com.xz.framework.system.security.dao.UserMapper;
 import com.xz.framework.system.app.login.domain.User;
 import com.xz.framework.system.app.login.service.LoginService;
 import com.xz.framework.util.MD5Encrypt;

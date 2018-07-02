@@ -1,8 +1,9 @@
 package com.xz.framework.system.app.userregister.service.impl;
 
-import com.xz.framework.system.app.login.dao.UserMapper;
+import com.xz.framework.system.security.dao.UserMapper;
 import com.xz.framework.system.app.login.domain.User;
 import com.xz.framework.system.app.userregister.service.UserRegisterService;
+import com.xz.framework.system.security.domain.MyUser;
 import com.xz.framework.system.sysbean.PageBean;
 import com.xz.framework.system.sysbean.impl.ResultInfo;
 import com.xz.framework.system.sysservice.BaseService;
@@ -27,7 +28,7 @@ public class UserRegisterServiceImpl extends BaseService implements UserRegister
     @Override
     public Map register(User user) throws  Exception {
         ResultInfo resultInfo=new ResultInfo();
-        List u=userMapper.selectByLoginid(user.getLoginid());
+        MyUser u=userMapper.selectByLoginid(user.getLoginid());
         if(!ObjectUtils.isEmpty(u)){
             resultInfo.setMsg("账号已经存在！");
             resultInfo.setSuccess(false);
@@ -49,12 +50,11 @@ public class UserRegisterServiceImpl extends BaseService implements UserRegister
     public List getUser(User user) throws Exception{
         ResultInfo resultInfo =new ResultInfo();
         List list=selectListForPageByObject("com.xz.framework.system.app.login.dao.UserMapper.selectByLoginid",user,3,1);
-
         return list;
     }
 
     @Override
     public PageBean getUserPageBean(User user) throws Exception{
-       return selectPageBeabForPageByObject("com.xz.framework.system.app.login.dao.UserMapper.selectByLoginid",user,3,1);
+       return selectPageBeabForPageByObject("com.xz.framework.system.security.dao.UserMapper.selectByLoginid",user,3,1);
     }
 }

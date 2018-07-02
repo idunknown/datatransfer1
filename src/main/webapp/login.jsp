@@ -7,16 +7,16 @@
     <title>登录页面</title>
 </head>
 <body>
-${param.error }
-<form action="/datatransfer/mylogin" method="post">
+<span style="color:red">${sessionScope.SPRING_SECURITY_LAST_EXCEPTION.message }</span>
+<form action="/datatransfer/user/login" method="post">
     <table>
         <tr>
             <td>用户名：</td>
-            <td><input type="text" name="username" /></td>
+            <td><input type="text" name="loginid" /></td>
         </tr>
         <tr>
             <td>密码：</td>
-            <td><input type="password" name="password" /></td>
+            <td><input type="password" name="logingo" /></td>
         </tr>
         <tr>
             <td colspan="2" align="center"><input type="submit" value="登录" />

@@ -5,10 +5,14 @@
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd ">
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/util
+	    http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
 
     <!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 
@@ -97,26 +101,86 @@
         <property name="templateLoaderPath" value="/html/" />
         <property name="defaultEncoding" value="UTF-8" />
     </bean>-->
-  <!--  <mvc:interceptors>
-        &lt;!&ndash; 多个拦截器，顺序执行 &ndash;&gt;
-      &lt;!&ndash;  <mvc:interceptor>
+
+    <context:property-placeholder/>
+
+    <bean id="sender" class="zipkin2.reporter.beans.OkHttpSenderFactoryBean">
+    <property name="endpoint" value="http://localhost:9411/api/v2/spans"/>
+  </bean>
+
+
+
+
+  <bean id="tracing" class="brave.spring.beans.TracingFactoryBean">
+    <property name="localServiceName" value="mycms"/>
+    <property name="spanReporter">
+      <bean class="zipkin2.reporter.beans.AsyncReporterFactoryBean">
+        <property name="encoder" value="JSON_V2"/>
+        <property name="sender" ref="sender"/>
+          <!-- wait up to half a second for any in-flight spans on close -->
+          <property name="closeTimeout" value="500"/>
+      </bean>
+    </property>
+    <property name="propagationFactory">
+      <bean id="propagationFactory" class="brave.propagation.ExtraFieldPropagation" factory-method="newFactory">
+        <constructor-arg index="0">
+          <util:constant static-field="brave.propagation.B3Propagation.FACTORY"/>
+        </constructor-arg>
+        <constructor-arg index="1">
+          <list>
+            <value>user-name</value>
+          </list>
+        </constructor-arg>
+      </bean>
+    </property>
+    <property name="currentTraceContext">
+      <bean class="brave.context.log4j2.ThreadContextCurrentTraceContext" factory-method="create"/>
+    </property>
+  </bean>
+
+  <bean id="httpTracing" class="brave.spring.beans.HttpTracingFactoryBean">
+    <property name="tracing" ref="tracing"/>
+  </bean>
+
+  <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+    <property name="interceptors">
+      <list>
+        <bean class="brave.spring.web.TracingClientHttpRequestInterceptor" factory-method="create">
+          <constructor-arg type="brave.http.HttpTracing" ref="httpTracing"/>
+        </bean>
+      </list>
+    </property>
+  </bean>
+
+
+
+    <mvc:interceptors>
+        <!-- 多个拦截器，顺序执行 -->
+      <!--  <mvc:interceptor>
             &lt;!&ndash; /** 表示所有的url，包括子url路径 &ndash;&gt;
             <mvc:mapping path="/**"/>
             <bean class="cn.labelnet.ssm.filter.HanderInterceptor1"></bean>
-        </mvc:interceptor>&ndash;&gt;
-        &lt;!&ndash; 配置登陆拦截器 &ndash;&gt;
-        <mvc:interceptor>
+        </mvc:interceptor>-->
+        <!-- 配置登陆拦截器 -->
+       <!-- <mvc:interceptor>
             <mvc:mapping path="/**"/>
             <mvc:exclude-mapping path="/user/login"/>
             <mvc:exclude-mapping path="/user/register"/>
             <bean class="com.xz.framework.system.intercepter.login.LoginHandlerIntercepter"></bean>
 
-        </mvc:interceptor>
-        &lt;!&ndash;
+        </mvc:interceptor>-->
+
+			<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			 <bean class="brave.spring.webmvc.TracingHandlerInterceptor" factory-method="create">
+               <constructor-arg type="brave.http.HttpTracing" ref="httpTracing"/>
+          </bean>
+		</mvc:interceptor>
+        <!--
         .....
 
-         &ndash;&gt;
-    </mvc:interceptors>-->
+         -->
+    </mvc:interceptors>
 
     <!--开启切面扫描-->
     <aop:aspectj-autoproxy proxy-target-class="true" />

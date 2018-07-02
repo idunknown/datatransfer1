@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="ybjdatatransfer">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="ybjdatatransfer.war">
+      <element id="artifact" artifact-name="datatransfer:war exploded" />
+    </root>
+  </artifact>
+</component>

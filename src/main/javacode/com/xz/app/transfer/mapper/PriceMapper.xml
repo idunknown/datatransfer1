@@ -194,4 +194,98 @@
       )
     </foreach>
   </insert>
+  <insert id="insertYbjBatch" parameterType="list" >
+    insert into ybj_data(
+
+		yka094,
+		akb020,
+		akc225,
+		yke123,
+		yka003,
+		yka007,
+		yke135,
+		aka074,
+		yke059,
+
+		yka295,
+		yka340,
+		akb021,
+		aae006,
+	    ykz003,
+        akb022,
+        yke400,
+        yke398,
+        time
+    )
+    VALUES
+    <foreach collection="list" item="item" separator=",">
+      (
+      #{item.yka094,jdbcType=VARCHAR},
+      #{item.akb020,jdbcType=VARCHAR},
+      #{item.akc225,jdbcType=DECIMAL},
+      #{item.yke123,jdbcType=TIMESTAMP},
+      #{item.yka003,jdbcType=VARCHAR},
+      #{item.yka007,jdbcType=VARCHAR},
+      #{item.yke135,jdbcType=VARCHAR},
+      #{item.aka074,jdbcType=VARCHAR},
+      #{item.yke059,jdbcType=VARCHAR},
+
+      #{item.yka295,jdbcType=VARCHAR},
+      #{item.yka340,jdbcType=VARCHAR},
+      #{item.akb021,jdbcType=VARCHAR},
+      #{item.aae006,jdbcType=VARCHAR},
+      #{item.ykz003,jdbcType=VARCHAR},
+      #{item.akb022,jdbcType=VARCHAR},
+      #{item.yke400,jdbcType=VARCHAR},
+      #{item.yke398,jdbcType=VARCHAR},
+      #{item.time,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+
+  <insert id="insertYbj" parameterType="hashmap" >
+    insert into ybj_data(
+
+    yka094,
+    akb020,
+    akc225,
+    yke123,
+    yka003,
+    yka007,
+    yke135,
+    aka074,
+    yke059,
+
+    yka295,
+    yka340,
+    akb021,
+    aae006,
+    ykz003,
+    akb022,
+    yke400,
+    yke398,
+    time
+    )
+    VALUES
+      (
+      #{yka094,jdbcType=VARCHAR},
+      #{akb020,jdbcType=VARCHAR},
+      #{akc225,jdbcType=DECIMAL},
+      #{yke123,jdbcType=TIMESTAMP},
+      #{yka003,jdbcType=VARCHAR},
+      #{yka007,jdbcType=VARCHAR},
+      #{yke135,jdbcType=VARCHAR},
+      #{aka074,jdbcType=VARCHAR},
+      #{yke059,jdbcType=VARCHAR},
+      #{yka295,jdbcType=VARCHAR},
+      #{yka340,jdbcType=VARCHAR},
+      #{akb021,jdbcType=VARCHAR},
+      #{aae006,jdbcType=VARCHAR},
+      #{ykz003,jdbcType=VARCHAR},
+       #{akb022,jdbcType=VARCHAR},
+        #{yke400,jdbcType=VARCHAR},
+       #{yke398,jdbcType=VARCHAR},
+       #{time,jdbcType=VARCHAR}
+      )
+  </insert>
 </mapper>

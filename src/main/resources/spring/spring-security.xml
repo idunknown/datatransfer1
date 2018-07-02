@@ -1,49 +1,118 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:se="http://www.springframework.org/schema/security"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
           http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
           http://www.springframework.org/schema/security
           http://www.springframework.org/schema/security/spring-security-4.2.xsd">
-    <!-- 认证管理器,配置了管理员与角色的关系  -->
-    <security:authentication-manager>
-        <!-- 配置账号密码所属的角色  角色以 ROLE_开头，为spring获取名称的标识 -->
-        <security:authentication-provider>
-            <!-- 采用xml的方式
-             -->
-            <security:user-service>
-                <security:user name="user" password="user" authorities="ROLE_USER" />
-                <security:user name="admin" password="admin" authorities="ROLE_ADMIN" />
-            </security:user-service>
-        </security:authentication-provider>
-    </security:authentication-manager>
-
+<!--
+<se:debug/>-->
+<!--    <bean class="org.springframework.security.authentication.event.LoggerListener"/>
+    <bean class="org.springframework.security.access.event.LoggerListener"/>-->
     <!--
         auto-config="true"      : 自动生成登录页面
         pattern="/admin/**"     : 为配置的路径,**表示支持子目录
         access="ROLE_ADMIN"     : 需要管理员权限,“ROLE_”前缀是一个提示Spring使用基于角色的检查的标记。
         use-expressions="true"    : 表示access中支持hasRole这样的函数
      -->
-    <security:http auto-config="true" use-expressions="true" >
+    <se:http pattern="/login.jsp" security="none"/>
+    <se:http pattern="/**/**.js" security="none"/>
+    <se:http auto-config="false" use-expressions="true"  >
 
         <!-- xml配置 access-denied-page="/login.jsp?error=access-denied-page"
          -->
-        <security:access-denied-handler error-page="/login.jsp"></security:access-denied-handler>
-        <security:intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
-        <security:intercept-url pattern="/user/**" access="hasAnyRole('ROLE_USER','ROLE_ADMIN')" />
-        <security:intercept-url pattern="/**" access="permitAll" />
-       <!-- <security:custom-filter ref=""-->
-
+        <se:access-denied-handler error-page="/forbidden.jsp"></se:access-denied-handler>
+    <!--    <se:intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
+        <se:intercept-url pattern="/user/**" access="hasAnyRole('ROLE_USER','ROLE_ADMIN')" />
+        <se:intercept-url pattern="/**" access="permitAll" />-->
+        <!-- <security:custom-filter ref=""-->
         <!--自定义登录界面-->
-        <security:form-login default-target-url="/user/index.jsp"
-                             username-parameter="username"
-                             password-parameter="password"
-                             authentication-failure-url="/login.jsp?error=authentication-failure-url"
-                             login-page="/login.jsp" login-processing-url="/mylogin"
+        <se:intercept-url pattern="/login.jsp" access="permitAll"   />
+<!--        <se:intercept-url pattern="/user/index.jsp" access="permitAll"   />-->
+        <se:intercept-url pattern="/**/**.js" access="permitAll"   />
+        <se:form-login default-target-url="/index.jsp"
+                       username-parameter="logingo"
+                       password-parameter="loginid"
+                       authentication-failure-url="/login.jsp?error=authentication-failure-url"
+                       login-page="/login.jsp" login-processing-url="/fafaf"/>
 
-        />
+        <se:custom-filter ref="myFilter" before="FORM_LOGIN_FILTER" ></se:custom-filter>
+        <se:custom-filter ref="mySecurityFilter" before="FILTER_SECURITY_INTERCEPTOR"></se:custom-filter>
+        <se:csrf disabled="true" ></se:csrf>
+    </se:http>
+    <bean id="myFilter" class="com.xz.framework.system.security.filter.MyLoginFilter" ><!--可以在该类中做登录验证逻辑比如验证码-->
+        <property name="passwordParameter" value="logingo"></property><!--密码name-->
+        <property name="usernameParameter" value="loginid"></property><!--登录名称name--><!--可以增加验证码-->
+        <property name="filterProcessesUrl" value="/fafaf" /><!--登录接口-->
+        <property name="authenticationManager" ref="myAuthenticationManager" /><!--认证管理器 -->
+        <property name="authenticationSuccessHandler" ref="loginLogAuthenticationSuccessHandler"></property>
+        <!-- 验证失败后的处理-->
+        <property name="authenticationFailureHandler" ref="MySimpleUrlAuthenticationFailureHandler"></property>
+        <!-- 注入DAO为了查询相应的用户 -->
+    </bean>
+    <bean id="loginLogAuthenticationSuccessHandler"
+                class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+        <property name="defaultTargetUrl" value="/user/index.jsp"></property>
+    </bean>
+    <bean id="MySimpleUrlAuthenticationFailureHandler"
+                class="com.xz.framework.system.security.handler.MySimpleUrlAuthenticationFailureHandler">
+        <!-- 可以配置相应的跳转方式。属性forwardToDestination为true采用forward false为sendRedirect -->
+        <property name="defaultFailureUrl" value="/login.jsp"></property>
+    </bean>
 
-    </security:http>
+    <!-- 认证管理器,配置了管理员与角色的关系  -->
+    <se:authentication-manager alias="myAuthenticationManager">
+        <se:authentication-provider user-service-ref="myUserDetailServiceImpl"><!--注入自己的用户服务类用于获取用户 也可以不自定义，直接采用-->
+        <!--  <se:password-encoder  ref="myPasswordEncode"> &lt;!&ndash;可以重写MessageDigestPasswordEncoder，在这个类中选择使用什么加密&ndash;&gt;
+              <se:salt-source user-property="id"/>
+          </se:password-encoder>-->
+        </se:authentication-provider>
+        <!-- 配置账号密码所属的角色  角色以 ROLE_开头，为spring获取名称的标识 -->
+  <!--      <se:authentication-provider >
+            &lt;!&ndash;  采用xml 方式&ndash;&gt;
+            <se:user-service>
+                <se:user name="user" password="user" authorities="ROLE_USER" />
+                <se:user name="admin" password="admin" authorities="ROLE_ADMIN" />
+            </se:user-service>
 
+        </se:authentication-provider>-->
+    </se:authentication-manager>
+    <bean id="myUserDetailServiceImpl" class="com.xz.framework.system.security.impl.MyUserDetailServiceImpl">
+    </bean>
+    <bean id="mySecurityFilter" class="com.xz.framework.system.security.filter.MySecurityFilter">
+        <!--&lt;!&ndash; 用户拥有的权限 &ndash;&gt;
+        <property name="authenticationManager" ref="myAuthenticationManager" />
+-->
+        <!-- 资源与权限对应关系 -->
+        <property name="securityMetadataSource" ref="mySecurityMetadataSource" />
+        <!-- 用户是否拥有所请求资源的权限 -->
+        <property name="accessDecisionManager" ref="myAccessDecisionManager" />
+
+
+    </bean>
+    <bean id="myAccessDecisionManager" class="com.xz.framework.system.security.manager.MyAccessDecisionManager"></bean>
+    <bean id="mySecurityMetadataSource" class="com.xz.framework.system.security.manager.MySecurityMetadataSource" init-method="init">
+        <property name="securityAfterLogin" ref="securityAfterLogin"></property>
+    </bean>
+
+    <bean id="securityAfterLogin" class="com.xz.framework.system.security.manager.SecurityAfterLogin">
+        <property name="url">
+            <set>
+                <value>/user/index.jsp</value>
+            </set>
+        </property>
+    </bean>
+
+  <!--  <bean id="myPasswordEncode" class="com.xz.framework.system.security.uitl.myPasswordEncode">
+        <constructor-arg name="algorithm" value="md5"></constructor-arg>
+        <constructor-arg name="encodeHashAsBase64" value="true"></constructor-arg>
+    </bean>
+    &lt;!&ndash; 未登录的切入点 &ndash;&gt;
+    <bean id="authenticationProcessingFilterEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+        <property name="loginFormUrl" value="/login.jsp"></property>-->
+<!--    </bean>-->
+   <!-- <bean>
+
+    </bean>-->
 </beans>

@@ -3,9 +3,11 @@ package com.xz.framework.system.app.login.controller;
 import com.xz.framework.system.preload.SysConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +21,8 @@ import java.util.Map;
 @RequestMapping("/index")
 public class IndexController {
     static final Logger log = LoggerFactory.getLogger(IndexController.class);
+    @Autowired
+    RestTemplate restTemplate;
     @RequestMapping("/")
     public String index(HttpServletRequest request, HttpServletResponse response) {
 
@@ -37,5 +41,11 @@ public class IndexController {
         m.put("aa","aa");
         m.put("bb","bb");
         return m;
+    }
+    @RequestMapping("/test")
+    @ResponseBody
+    public  Object test(){
+       Object o= restTemplate.getForObject("http://127.0.0.1:8083/datatransfer1/index1/test1",String.class);
+        return o;
     }
 }

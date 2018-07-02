@@ -67,7 +67,9 @@ public final class DateUtils {
     public static String getNow(String format) {
         return format(new Date(), format);
     }
-
+    public static String getDateStr(Date date,String format) {
+        return format(date, format);
+    }
     /**
      * 使用预设格式格式化日期
      *

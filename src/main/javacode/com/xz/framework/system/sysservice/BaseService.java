@@ -84,7 +84,9 @@ public abstract class BaseService  {
         this.mapper = mapper;
     }
 
-
+    public List insertBatchWithSimpleSql(String sqlId,List<Map> list){
+        return baseDao.insertBatchWithSimpleSql(sqlId,list);
+    }
 
    // protected abstract  String getMapper();
   /*  private String getSqlId(String sqlId) throws Exception{

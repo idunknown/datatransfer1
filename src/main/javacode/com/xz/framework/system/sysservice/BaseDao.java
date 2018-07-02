@@ -3,6 +3,8 @@ package com.xz.framework.system.sysservice;
 import com.xz.framework.system.sysbean.PageBean;
 import com.xz.framework.util.CountStatementUtil;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +26,7 @@ public class BaseDao extends SqlSessionDaoSupport {
         param.put("min",CountStatementUtil.firstParam(pageSize,page));
         param.put("max",CountStatementUtil.secondParam(pageSize,page));
         //查询list
-        MappedStatement statement = CountStatementUtil.createPageListSql(sqlId);
+        MappedStatement statement = CountStatementUtil.createPageListSql(sqlId,param);
         List l=super.getSqlSession().selectList(statement.getId(),param);
         //查询总数
         MappedStatement statement1 = CountStatementUtil.createPageCountSql(sqlId);
@@ -69,4 +71,34 @@ public class BaseDao extends SqlSessionDaoSupport {
         return pageBean.getPageList();
     }
 
+    /**
+     * 简单sql批量插入，适合数据量大的list
+     * 如果数据量小，采用foreach标签
+     * @param sqlId
+     * @param list
+     * @return
+     */
+    public List insertBatchWithSimpleSql(String sqlId,List<Map> list){
+        SqlSession session=CountStatementUtil.getSqlSessionTemplate().getSqlSessionFactory().openSession(ExecutorType.BATCH,false);
+       try{
+           if(list!=null&&list.size()>0){
+            for(int i=0;i<list.size();i++){
+
+                int num=session.insert(sqlId,list.get(i));
+                if(i>0&&i%300==0||i==list.size()-1){
+                    session.commit();
+                    session.clearCache();
+                }
+            }
+           }
+       }catch(Exception e) {
+// 没有提交的数据可以回滚
+            session.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return list;
+
+    }
     }

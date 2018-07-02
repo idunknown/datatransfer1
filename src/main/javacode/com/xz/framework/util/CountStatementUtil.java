@@ -12,6 +12,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author  wuhy on 2017/11/16.
@@ -139,7 +140,7 @@ public class CountStatementUtil {
     }
 
 
-    public static MappedStatement createPageListSql(String sqlId){
+    public static MappedStatement createPageListSql(String sqlId,Map param){
         //获取数据库整体配置
         Configuration configuration=sqlSessionTemplate.getSqlSessionFactory().getConfiguration();
         try{
@@ -159,6 +160,16 @@ public class CountStatementUtil {
             parameterMapping = new ParameterMapping.Builder(configuration, "max", Integer.class).jdbcType(JdbcType.INTEGER).build();
             parameterMappings.add(parameterMapping);
             //新的sql语句
+           /* sqlSessionTemplate.
+
+            SqlNode sqlNode=((DynamicSqlSource)sqlSource).getRootSqlNode();
+
+            configuration.getMapper(UserMapper.class,sqlSessionTemplate.getSqlSessionFactory());
+*/
+
+
+
+
 
             String sql =  mydialect.getLimitString(sqlSource.getBoundSql(null).getSql());
             //创建新的sql对象
@@ -176,6 +187,15 @@ public class CountStatementUtil {
             }
             RawSqlSource ada=new RawSqlSource(configuration,sqlb.toString(), HashMap.class);
 
+
+           /* XNode context=new XNode();
+            MapperBuilderAssistant builderAssistant= new MapperBuilderAssistant(configuration, "");
+            final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, context, "");
+            try {
+                statementParser.parseStatementNode();
+            } catch (IncompleteElementException e) {
+                configuration.addIncompleteStatement(statementParser);
+            }*/
             //创建内部内对象
             MappedStatement.Builder mb = new MappedStatement.Builder(configuration, getListStatementId(sqlId), ada, SqlCommandType.SELECT);
 

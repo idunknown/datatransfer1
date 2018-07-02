@@ -4,7 +4,7 @@ package com.xz.framework.system.app.login.domain;
  * @author  wuhy on 2017/11/16.
  */
 public class User {
-    private Integer id;
+    private Integer userid;
 
     private String loginid;
 
@@ -12,12 +12,12 @@ public class User {
 
     private String effective;
 
-    public Integer getId() {
-        return id;
+    public Integer getUserid() {
+        return userid;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setUserid(Integer userid) {
+        this.userid = userid;
     }
 
     public String getLoginid() {
